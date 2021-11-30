@@ -29,10 +29,12 @@ def createSoupFromFile():
 
 
 def getLastID(cur):
-    cur.execute('CREATE TABLE IF NOT EXISTS Artists (artist_id INTEGER PRIMARY KEY, name TEXT, fans_count)')
+    # create the table if not exist
+    cur.execute('CREATE TABLE IF NOT EXISTS Artists (artist_id INTEGER PRIMARY KEY, name TEXT, fans_count INTEGER)')
     # checking what have already been stored to the database
     # get the last row of the database
-    cur.execute('SELECT artist_id, name FROM Artists ORDER BY artist_id DESC LIMIT 1')
+    # change the table name if expecting to get the id from other tables
+    cur.execute('SELECT artist_id FROM Artists ORDER BY artist_id DESC LIMIT 1')
     row = cur.fetchone()
     # check if this is the first time inserting any data
     if row: 
