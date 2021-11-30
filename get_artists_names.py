@@ -29,7 +29,7 @@ def createSoupFromFile():
 
 
 def getLastID(cur):
-    cur.execute('CREATE TABLE IF NOT EXISTS Artists (artist_id INTEGER PRIMARY KEY, name TEXT)')
+    cur.execute('CREATE TABLE IF NOT EXISTS Artists (artist_id INTEGER PRIMARY KEY, name TEXT, fans_count)')
     # checking what have already been stored to the database
     # get the last row of the database
     cur.execute('SELECT artist_id, name FROM Artists ORDER BY artist_id DESC LIMIT 1')
@@ -47,6 +47,7 @@ def getLastID(cur):
 
 def getData(soup, cur, conn):
     names = []
+    fans = []
     start = getLastID(cur)
 
     table = soup.find('table')
@@ -54,19 +55,21 @@ def getData(soup, cur, conn):
     if table != None:
         rows = table.find_all("tr")
         # scraping only 25 elements from the website
-        for r in rows[start + 1: start + 26]:
+        for r in rows[start + 1: start + 21]:
             name_cols = r.find('td', class_ = "name")
+            fan = r.find('td', class_ = 'count').text.split()[2]
             names.append(name_cols.text.strip('\n'))
+            fans.append(fan)
 
     # create the artist database 
-    createArtistDatabase(cur, conn, names, start)
+    createArtistDatabase(cur, conn, names, fans, start)
 
 
-def createArtistDatabase(cur, conn, names, start):
+def createArtistDatabase(cur, conn, names, fans, start):
     # iteraing through the scraped data and insert them into the database
     for i in range(0, len(names)): 
-        cur.execute('INSERT OR IGNORE INTO Artists (artist_id, name) VALUES (?, ?)', \
-            (start+1, names[i].strip('\n')))
+        cur.execute('INSERT OR IGNORE INTO Artists (artist_id, name, fans_count) VALUES (?, ?, ?)', \
+            (start+1, names[i], fans[i]))
         start += 1
     conn.commit()
 
