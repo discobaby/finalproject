@@ -2,6 +2,7 @@
 # Name: Ember Shan
 # Using the tiktok API to get the networth about the artist
 # and store the information in the Networth table
+# can only find networths for 111 artists out of 200
 #############
 import json
 import os
@@ -9,10 +10,10 @@ import requests
 import sqlite3
 
 
-def getToken():
+def getKey():
     # get my API key from file
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    path = dir_path + '/' + 'tokens.txt'
+    path = dir_path + '/' + 'API_keys.txt'
     f = open(path, 'r')
     t = f.readline()
     f.close()
@@ -51,7 +52,7 @@ def getNameList(cur):
 
 def getNetWorth(names, cur, conn):
     # get the artist infortion from the celebrity API
-    key = getToken()
+    key = getKey()
     networth = []
     for n in names:
         # get the api request url
