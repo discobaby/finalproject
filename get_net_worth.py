@@ -22,7 +22,8 @@ def getKey():
 
 def getLastID(cur):
     # first create the table
-    cur.execute('CREATE TABLE IF NOT EXISTS NetWorth (id INTEGER PRIMARY KEY, name TEXT, net_worth NUMBER, age INTEGER, gender TEXT)')
+    cur.execute('CREATE TABLE IF NOT EXISTS NetWorth (celebrity_id INTEGER PRIMARY KEY, id INTEGER, name TEXT, net_worth NUMBER)')
+    cur.execute('CREATE TABLE IF NOT EXISTS CelebrityInfo (celebrity_id INTEGER, name TEXT, age INTEGER, gender TEXT, nationality TEXT)')
     # checking what have already been stored to the database
     # get the last row of the database
     # change the table name if expecting to get the id from other tables
@@ -64,8 +65,8 @@ def getNetWorth(names, cur, conn):
             # check if the returned celebrity information is really what we are look for
             for dict in d:
                 if dict['name'].lower() == n[1].lower():
-                    # create a list of tuples with id, name, networth, age, and gender
-                    networth.append(tuple([n[0], n[1], dict.get('net_worth', -1), dict.get('age', -1), dict.get('gender', 'NA')]))
+                    # create a list of tuples with id, name, networth, age, gender, and nationality
+                    networth.append(tuple([n[0], n[1], dict.get('net_worth', -1), dict.get('age', -1), dict.get('gender', 'NA'), dict.get('nationality', 'NA')]))
                     break
         else:
             print("Error:", r.status_code, r.text)
@@ -75,13 +76,19 @@ def getNetWorth(names, cur, conn):
 
 
 def insertIntoDatabase(networth, cur, conn):
+    cur.execute('SELECT celebrity_id FROM NetWorth ORDER BY celebrity_id DESC LIMIT 1')
+    row = cur.fetchone()
+    if row: id = row[0]
+    else: id = 0
+    # print(id)
     # iterate through the list and add them to the table with the id that is the same as the artist_id in the Artists table
     for t in networth:
-        cur.execute('INSERT OR IGNORE INTO NetWorth (id, name, net_worth, age, gender) VALUES (?, ?, ?, ?, ?)', \
-                (t[0], t[1], t[2], t[3], t[4]) )
-
+        id += 1
+        cur.execute('INSERT OR IGNORE INTO NetWorth (celebrity_id, id, name, net_worth) VALUES (?, ?, ?, ?)', \
+                (id, t[0], t[1], t[2]) )
+        cur.execute('INSERT OR IGNORE INTO CelebrityInfo (celebrity_id, name, age, gender, nationality) VALUES (?, ?, ?, ?, ?)', \
+                (id, t[1], t[3], t[4], t[5]) )
     conn.commit()
-
 
 def main():
     # connect to the database
