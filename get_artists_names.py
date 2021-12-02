@@ -2,7 +2,7 @@
 # Name: Ember Shan
 # This file is to get a list of 200 artists names from the website
 # And store them in the Artists table in the database 
-# a total of 200 artist names so a total of 8 times executing this code to add all items
+# a total of 200 artist names so a total of 10 times executing this code to add all items
 #############
 
 import os 
