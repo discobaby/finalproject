@@ -22,13 +22,15 @@ auth_response = requests.post(auth_url, data=data)
 access_token = auth_response.json().get('access_token')
 #print(access_token)
 
-def getLastID(cur):
+def getLastID(cur, tablename, idname):
     # createa the table
-    cur.execute('CREATE TABLE IF NOT EXISTS SpotifyArtistData (id INTEGER PRIMARY KEY, name TEXT, followers INTEGER, genre TEXT)')
+    cur.execute('CREATE TABLE IF NOT EXISTS SpotifyArtistData (id INTEGER PRIMARY KEY, name TEXT, followers INTEGER, genre_id INTEGER)')
+    # create another table with shared key 
+    cur.execute('CREATE TABLE IF NOT EXISTS SpotifyGenreData (genre_id INTEGER PRIMARY KEY, genre TEXT)')
     # checking what have already been stored to the database
     # get the last row of the database
     # change the table name if expecting to get the id from other tables
-    cur.execute('SELECT id FROM SpotifyArtistData ORDER BY id DESC LIMIT 1')
+    cur.execute('SELECT {} FROM {} ORDER BY {} DESC LIMIT 1'.format(idname, tablename, idname))
     row = cur.fetchone()
     # check if this is the first time inserting any data
     if row: 
@@ -41,7 +43,7 @@ def getLastID(cur):
     return count
 
 def getListOfArtists(cur):
-    id = getLastID(cur)
+    id = getLastID(cur, 'SpotifyArtistData', 'id')
     cur.execute("SELECT artist_id, name FROM Artists WHERE artist_id > ? AND artist_id <= ?", (id, id+20))
     rows = cur.fetchall()
     names = []
@@ -69,10 +71,21 @@ def getArtistInfo(names, cur, conn):
     insertIntoDatabase(artist_info, cur, conn)
     
 def insertIntoDatabase(artist_info, cur, conn):
-    # iterate through the list and add them to the table with the id that is the same as the artist_id in the Artists table
     for t in artist_info:
-        cur.execute('INSERT OR IGNORE INTO SpotifyArtistData (id, name, followers, genre) VALUES (?, ?, ?, ?)', \
-                (t[0], t[1], t[2], t[3]) )
+        # iterate through the list and add them to the table with the id that is the same as the artist_id in the Artists table
+        cur.execute('SELECT genre_id FROM SpotifyGenreData WHERE genre = ?', (t[-1],))
+        row = cur.fetchone()
+        # check if this is the first time inserting any data
+        if row: 
+            id = row[0]
+        else: 
+            id = getLastID(cur, 'SpotifyGenreData', 'genre_id') + 1
+        print(id)
+        
+        cur.execute('INSERT OR IGNORE INTO SpotifyArtistData (id, name, followers, genre_id) VALUES (?, ?, ?, ?)', \
+                (t[0], t[1], t[2], id) )
+        cur.execute('INSERT OR IGNORE INTO SpotifyGenreData (genre_id, genre) VALUES (?, ?)', \
+                (id, t[3]) )
     conn.commit()
         
 
