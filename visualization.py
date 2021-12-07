@@ -127,7 +127,9 @@ def getTwitterFollowersByGenre(cur, conn):
     
         # save the data to a file 
     f = open(dir_path + '/calculation_files/avg_twitter_followers_by_genre.txt', 'w')
-    f.write(f'average twitter followers: {avg_list}, list of genres: {genre_name_list}')
+    f.write('1. genre, 2. average twitter followers'+ '\n')
+    for i in range(len(avg_list)): 
+        f.write( f'{genre_name_list[i]}, {avg_list[i]}' + '\n')
     f.close()
     
     #Creating my plot, passing in genre_name_list and avg_list for my axes.
@@ -147,11 +149,11 @@ def main():
     conn = sqlite3.connect(dir_path + '/' + "finalproject.db")
     cur = conn.cursor()
     # first visualization  
-    genderScatterPlot(cur, conn)
+    # genderScatterPlot(cur, conn)
     # second visualization 
-    getAvgNetworthByGender(cur)
+    # getAvgNetworthByGender(cur)
     # third visualization 
-    genderFollowersScatterPlot(cur, conn)
+    # genderFollowersScatterPlot(cur, conn)
     # fourth visualization 
     getTwitterFollowersByGenre(cur, conn)
 
