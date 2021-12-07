@@ -22,7 +22,7 @@ def createSoup():
 def createSoupFromFile():
     # in case the website changes or denied web scraping
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    path = dir_path + '/' + 'Most_Popular_Artists_Worldwide.html'
+    path = dir_path + '/backup_website' + 'Most_Popular_Artists_Worldwide.html'
     with open(path) as pg:
         soup = BeautifulSoup(pg, "html.parser")
     return soup
