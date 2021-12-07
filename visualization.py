@@ -125,6 +125,11 @@ def getTwitterFollowersByGenre(cur, conn):
         #Appending my averages to a list, for all of the genres.
         avg_list.append(average_num)
     
+        # save the data to a file 
+    f = open(dir_path + '/calculation_files/avg_twitter_followers_by_genre.txt', 'w')
+    f.write(f'average twitter followers: {avg_list}, list of genres: {genre_name_list}')
+    f.close()
+    
     #Creating my plot, passing in genre_name_list and avg_list for my axes.
     fig = plt.figure(figsize = (15, 10))
     plt.bar(genre_name_list, avg_list)
