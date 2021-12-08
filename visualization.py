@@ -149,11 +149,11 @@ def main():
     conn = sqlite3.connect(dir_path + '/' + "finalproject.db")
     cur = conn.cursor()
     # first visualization  
-    # genderScatterPlot(cur, conn)
+    genderScatterPlot(cur, conn)
     # second visualization 
-    # getAvgNetworthByGender(cur)
+    getAvgNetworthByGender(cur)
     # third visualization 
-    # genderFollowersScatterPlot(cur, conn)
+    genderFollowersScatterPlot(cur, conn)
     # fourth visualization 
     getTwitterFollowersByGenre(cur, conn)
 
